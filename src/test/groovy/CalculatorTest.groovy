@@ -24,4 +24,19 @@ class CalculatorTest extends Specification {
             1.0f    | 1.0f    | 1f
             1.0f    | 0f      | 0f
     }
+
+    def "should do an absolute sum"() {
+        when:
+            def resultOfAbsolutSum = Calculator.absoluteSum(a, b)
+        then:
+            resultOfAbsolutSum == expectedResult
+        where:
+            a | b | expectedResult
+            1 | -6   | 7
+           -1 | -8   | 9
+            1 | null | null
+         null | null | null
+
+
+    }
 }
