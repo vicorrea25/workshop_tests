@@ -1,3 +1,8 @@
+import api.EmailApi;
+import api.NumberApi;
+
+import java.util.Arrays;
+
 /**
  *
  * Your task is to process a sequence of integer numbers to determine the following statistics:
@@ -21,4 +26,60 @@
  */
 public class ListHelper {
 
+    private final NumberApi numberApi;
+
+    public ListHelper(NumberApi numberApi) {
+        this.numberApi = numberApi;
+    }
+
+    private int[] getNumbers() {
+        return numberApi.getListOfNumbers();
+    }
+
+    public int returnTheLowestValue(){
+        if(getNumbers().length == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+
+        return Arrays.stream(getNumbers()).min().getAsInt();
+    }
+
+    public int returnTheMaximumValue(){
+        if(getNumbers().length == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+        return Arrays.stream(getNumbers()).max().getAsInt();
+    }
+
+    public Long returnTheSequence(){
+        if(getNumbers().length == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+        return Arrays.stream(getNumbers()).count();
+    }
+
+    public String returnAverageValue(){
+        if(getNumbers().length == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+        Double result = Arrays.stream(getNumbers()).average().getAsDouble();
+        String resultString = String.format("%.6f", result);
+
+        return resultString;
+    }
+
+    public Boolean verifyNumberOfElementsAndTheSequenceToReturnABooleanValue(){
+        Boolean result = false;
+        if(getNumbers().length == 0) {
+            throw new RuntimeException("Lista vazia");
+        }
+        Double average = Arrays.stream(getNumbers()).average().getAsDouble();
+        Long numberOfElements = Arrays.stream(getNumbers()).count();
+
+        if(average >= 20 && numberOfElements == 6) {
+            result = true;
+        }
+
+        return result;
+    }
 }
