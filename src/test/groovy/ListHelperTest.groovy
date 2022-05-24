@@ -2,137 +2,115 @@ import api.EmailApi
 import api.NumberApi
 import org.mockito.Mockito
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class ListHelperTest extends Specification {
 
-    NumberApi numberApi = Mockito.mock(NumberApi)
-    ListHelper helper = new ListHelper(numberApi)
+    NumberApi numberApi
+    ListHelper helper
 
+    def setup() {
+        numberApi = Mockito.mock(NumberApi)
+        helper = new ListHelper(numberApi)
+    }
+
+    @Unroll
     def "should return the lowest value"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
         when:
-        int returnValue = helper.returnTheLowestValue();
+            int returnValue = helper.getLowest();
         then:
-        returnValue == expected
+            returnValue == expected
         where:
-        values | expected
-        [6, 9, 15, -2, 92, 11] as int[] | -2
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | -2
     }
 
-    def "should return error if informed a empty list in method --> returnTheLowestValue"() {
+    @Unroll
+    def "should return error if informed a empty list"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
         when:
-        helper.returnTheLowestValue();
+            helper.getNumbers();
         then:
-        thrown(expectedException)
+            thrown(RuntimeException)
         where:
-             values | expectedException
-        [] as int[] | RuntimeException
-             null   | RuntimeException
+            values << [[] as int[], null]
     }
 
+    @Unroll
     def "should return the maximum value"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
         when:
-        int returnValue = helper.returnTheMaximumValue();
+            int returnValue = helper.getMaximum();
         then:
-        returnValue == expected
+            returnValue == expected
         where:
-        values | expected
-        [6, 9, 15, -2, 92, 11] as int[] | 92
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | 92
+            [-6, -9, -15, -2, -92, -11] as int[] | -2
     }
 
-    def "should return error if informed a empty list in method --> returnTheMaximumValue"() {
-        given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
-        when:
-        helper.returnTheMaximumValue();
-        then:
-        thrown(expectedException)
-        where:
-        values | expectedException
-        [] as int[] | RuntimeException
-        null   | RuntimeException
-    }
-
+    @Unroll
     def "should return the sequence of elements"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
         when:
-        int returnValue = helper.returnTheSequence();
+            int returnValue = helper.getSequence();
         then:
-        returnValue == expected
+            returnValue == expected
         where:
-        values | expected
-        [6, 9, 15, -2, 92, 11] as int[] | 6
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | 6
     }
 
-    def "should return error if informed a empty list in method --> returnTheSequence"() {
-        given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
-        when:
-        helper.returnTheSequence();
-        then:
-        thrown(expectedException)
-        where:
-        values | expectedException
-        [] as int[] | RuntimeException
-        null   | RuntimeException
-    }
-
+    @Unroll
     def "should return the average of values"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
-        when:
-        String returnValue = helper.returnAverageValue();
-        then:
-        returnValue == expected
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+        expect:
+            helper.getAverage() == expected
         where:
-        values | expected
-        [6, 9, 15, -2, 92, 11] as int[] | "21.833333"
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | 21.833333
     }
 
-    def "should return error if informed a empty list in method --> returnAverageValue"() {
-        given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
-        when:
-        helper.returnAverageValue();
-        then:
-        thrown(expectedException)
-        where:
-        values | expectedException
-        [] as int[] | RuntimeException
-        null   | RuntimeException
-    }
-
+    @Unroll
     def "should validate if array is in conditions"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            def count = 0
         when:
-        Boolean returnValue = helper.verifyNumberOfElementsAndTheSequenceToReturnABooleanValue();
+            Boolean returnValue = helper.isValid();
         then:
-        returnValue == expected
+            returnValue == expected
         where:
-        values | expected
-        [6, 9, 15, -2, 92, 11] as int[] | true
-        [6, 9, 15, -2, 92] as int[] | false
-        [6, 9, 15, -2, 0, 11] as int[] | false
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | true
+            [6, 9, 15, -2, 92] as int[]     | false
+            [6, 9, 15, -2, 0, 11] as int[]  | false
 
     }
 
-    def "should return error if informed a empty list in method --> verifyNumberOfElementsAndTheSequenceToReturnABooleanValue"() {
+    @Unroll
+    def "should validate who many times the API is called"() {
         given:
-        Mockito.when(numberApi.getListOfNumbers()).thenReturn(values)
+            NumberApi numberApi = Mock()
+            ListHelper listHelper = new ListHelper(numberApi)
         when:
-        helper.verifyNumberOfElementsAndTheSequenceToReturnABooleanValue();
+            Boolean returnValue = listHelper.isValid();
         then:
-        thrown(expectedException)
+            returnValue == expected
+            1 * numberApi.getListOfNumbers() >> values
+
         where:
-        values | expectedException
-        [] as int[] | RuntimeException
-        null   | RuntimeException
+            values                          | expected
+            [6, 9, 15, -2, 92, 11] as int[] | true
+            [6, 9, 15, -2, 92] as int[]     | false
+            [6, 9, 15, -2, 0, 11] as int[]  | false
+
     }
+
 }

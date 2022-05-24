@@ -16,10 +16,7 @@ public class RemoveDuplicated {
             return emptyArr;
         }
 
-        int[] result = Arrays.stream(list).distinct().toArray();
-
-        return result;
-
+        return Arrays.stream(list).distinct().toArray();
     }
 
 }
